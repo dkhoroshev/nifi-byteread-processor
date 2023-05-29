@@ -1,4 +1,4 @@
-package com.github.shuvvers.nifi.processor;
+package com.github.shivvers.nifi.processor;
 
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.processor.AbstractProcessor;

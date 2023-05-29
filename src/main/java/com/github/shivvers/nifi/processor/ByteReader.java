@@ -1,8 +1,6 @@
-package com.github.shuvvers.nifi.processor;
+package com.github.shivvers.nifi.processor;
 
-import com.github.shuvvers.nifi.extension.UnknownMessageTypeException;
-import com.github.shuvvers.nifi.extension.MessageReadingException;
-import com.github.shuvvers.nifi.service.ByteService;
+import com.github.shivvers.nifi.service.ByteService;
 
 import org.apache.nifi.annotation.behavior.SideEffectFree;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
@@ -13,7 +11,6 @@ import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
 
-import javax.management.Descriptor;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,7 +36,7 @@ public class ByteReader extends ByteProcessor {
 
             FlowFile outputFlowFile = processSession.write(flowFile, (InputStream in, OutputStream out) -> {
                try {
-                   // TODO: ByteService.readMessage(byteofsize, in, out);
+                   ByteService.readMessage(bytesofsize, in, out);
                } catch (Exception e) {
                    getLogger().error(e.getMessage(), e);
                    error.set(ERROR);

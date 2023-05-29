@@ -1,8 +1,8 @@
-package com.github.shuvvers.nifi.service;
+package com.github.shivvers.nifi.service;
 
-import com.github.shuvvers.nifi.extension.UnknownMessageTypeException;
-import com.github.shuvvers.nifi.extension.MessageReadingException;
-import com.github.shuvvers.nifi.parser.DataParser;
+import com.github.shivvers.nifi.extension.MessageReadingException;
+import com.github.shivvers.nifi.extension.UnknownMessageTypeException;
+
 import java.io.*;
 import java.nio.ByteBuffer;
 
@@ -26,8 +26,7 @@ public class ByteService {
         final int messageLen = in.available();
         int bytesRead = 0;
 
-        while (true){
-            if (bytesRead >= messageLen) { break; }
+        while (bytesRead >= messageLen){
 
             byte[] messageSizeHeader = new byte[MESSAGE_SIZE_HEADER_SIZE];
             int messageSize = ByteBuffer.wrap(messageSizeHeader).getInt();

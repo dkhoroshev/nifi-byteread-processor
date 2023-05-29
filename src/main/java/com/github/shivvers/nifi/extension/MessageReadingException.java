@@ -1,4 +1,4 @@
-package com.github.shuvvers.nifi.extension;
+package com.github.shivvers.nifi.extension;
 
 import java.io.IOException;
 

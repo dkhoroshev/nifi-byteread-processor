@@ -1,4 +1,4 @@
-package com.github.shuvvers.nifi.extension;
+package com.github.shivvers.nifi.extension;
 
 public class UnknownMessageTypeException extends Exception {
     public UnknownMessageTypeException(String messageType) {
