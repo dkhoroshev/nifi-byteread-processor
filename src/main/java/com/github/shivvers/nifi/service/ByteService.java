@@ -6,7 +6,9 @@ import com.github.shivvers.nifi.mapper.ByteIntMap;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class ByteService {
 
@@ -19,7 +21,7 @@ public class ByteService {
      * @throws MessageEncodingException Thrown when an error occurs during the binary encoding
      * @throws UnknownMessageTypeException  Thrown when the given message type is not contained in the schema
      */
-    public static void readMessage(Integer size, InputStream in, OutputStream out) throws IOException, UnknownMessageTypeException, MessageReadingException {
+    public static void readMessage(Integer size, InputStream in, List<byte[]> messages) throws IOException, UnknownMessageTypeException, MessageReadingException {
         if (size == null) {
             throw new IOException("Message size address is null!");
         }
@@ -31,6 +33,7 @@ public class ByteService {
         while (bytesRead <= messageLen){
             byte[] messageSizeHeader = new byte[MESSAGE_SIZE_HEADER_SIZE];
             int bytesReadInHeader = in.read(messageSizeHeader);
+            if (bytesReadInHeader == -1) { break; }
 
             int messageSize = ByteIntMap.byteArrayToInt(messageSizeHeader);
 
@@ -44,7 +47,8 @@ public class ByteService {
 
             bytesRead += bytesReadInMessage;
 
-            out.write(message);
+            messages.add(message);
+
         }
     }
 }
