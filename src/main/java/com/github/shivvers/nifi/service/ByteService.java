@@ -2,9 +2,11 @@ package com.github.shivvers.nifi.service;
 
 import com.github.shivvers.nifi.extension.MessageReadingException;
 import com.github.shivvers.nifi.extension.UnknownMessageTypeException;
+import com.github.shivvers.nifi.mapper.ByteIntMap;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class ByteService {
 
@@ -26,22 +28,23 @@ public class ByteService {
         final int messageLen = in.available();
         int bytesRead = 0;
 
-        while (bytesRead >= messageLen){
-
+        while (bytesRead <= messageLen){
             byte[] messageSizeHeader = new byte[MESSAGE_SIZE_HEADER_SIZE];
-            int messageSize = ByteBuffer.wrap(messageSizeHeader).getInt();
-            bytesRead += MESSAGE_SIZE_HEADER_SIZE;
+            int bytesReadInHeader = in.read(messageSizeHeader);
+
+            int messageSize = ByteIntMap.byteArrayToInt(messageSizeHeader);
+
+            bytesRead += bytesReadInHeader;
 
             byte[] message = new byte[messageSize];
             int bytesReadInMessage = 0;
-            while (bytesReadInMessage < messageSize){
-                bytesReadInMessage += in.read(message, bytesRead, messageSize);
+            while (bytesReadInMessage < messageSize && bytesReadInMessage != -1){
+                bytesReadInMessage += in.read(message);
             }
 
-            bytesRead += messageSize;
+            bytesRead += bytesReadInMessage;
 
             out.write(message);
-
         }
     }
 }
