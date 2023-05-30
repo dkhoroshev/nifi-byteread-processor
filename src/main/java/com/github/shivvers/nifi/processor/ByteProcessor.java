@@ -33,9 +33,9 @@ public abstract class ByteProcessor extends AbstractProcessor {
 
     /*          RELATIONSHIPS           */
 
-    static final Relationship SUCCESS = new Relationship.Builder()
-            .name("Success")
-            .description("Success relationship")
+    static final Relationship REL_SPLITS = new Relationship.Builder()
+            .name("splits")
+            .description("All Splits will be routed to the splits relationship")
             .build();
 
     static final Relationship ERROR = new Relationship.Builder()
@@ -47,7 +47,7 @@ public abstract class ByteProcessor extends AbstractProcessor {
     public void init(final ProcessorInitializationContext context){
         this.properties = List.of(BYTES_TO_READ);
 
-        this.relationships = Set.of(SUCCESS, ERROR);
+        this.relationships = Set.of(REL_SPLITS, ERROR);
 
         this.bytesofsize = 4;
     }
