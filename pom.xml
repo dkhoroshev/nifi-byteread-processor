@@ -6,7 +6,7 @@
 
     <groupId>com.shivvers.nifi</groupId>
     <artifactId>nifi-byteread-processor</artifactId>
-    <version>1.21.0</version>
+    <version>1.21.0.1</version>
     <packaging>nar</packaging>
 
     <developers>

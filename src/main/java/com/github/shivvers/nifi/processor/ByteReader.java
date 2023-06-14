@@ -19,14 +19,20 @@ import org.apache.nifi.serialization.WriteResult;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.ZoneOffset;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SideEffectFree
 @Tags({"read", "binary", "message"})
 @CapabilityDescription("Read data from the message according to its length specified before the message fragment in Bytes sequence.")
 public class ByteReader extends ByteProcessor {
 
+    private static final Pattern TIMESTAMP_PATTERN = Pattern.compile("\\d{9,}");
     public static final String FRAGMENT_ID = FragmentAttributes.FRAGMENT_ID.key();
     public static final String FRAGMENT_INDEX = FragmentAttributes.FRAGMENT_INDEX.key();
     public static final String FRAGMENT_COUNT = FragmentAttributes.FRAGMENT_COUNT.key();
@@ -45,7 +51,7 @@ public class ByteReader extends ByteProcessor {
             processSession.transfer(flowFile, ERROR);
         } else {
             List<byte[]> messages = new ArrayList<>();
-//            final Map<String, String> originalAttributes = flowFile.getAttributes();
+            processSession.putAttribute(flowFile, "requestTimestamp", extractTimestamp(flowFile));
             final String fragmentId = UUID.randomUUID().toString();
             final List<FlowFile> flowFileArrayList = new ArrayList<>();
             try {
@@ -92,5 +98,27 @@ public class ByteReader extends ByteProcessor {
             getLogger().info("Successfully split {} into {} FlowFiles", new Object[] {flowFile, flowFileArrayList.size()});
             processSession.remove(flowFile);
         }
+    }
+    private String extractTimestamp(FlowFile flowFile) {
+        String filename = flowFile.getAttribute("filename");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedTimestamp = "2023";
+        Matcher matcher = TIMESTAMP_PATTERN.matcher(filename);
+        try {
+            if (matcher.find()){
+                long timestampUnix = Long.parseLong(matcher.group());
+                LocalDateTime timestamp = LocalDateTime.ofEpochSecond(timestampUnix, 0, ZoneOffset.UTC);
+                formattedTimestamp = timestamp.format(formatter);
+            }
+            else {
+                long timestampUnix = Long.parseLong(flowFile.getAttribute("s3.lastModified"));
+                LocalDateTime timestamp = LocalDateTime.ofEpochSecond(timestampUnix/1000, 0, ZoneOffset.UTC);
+                formattedTimestamp = timestamp.format(formatter);
+            }
+        } catch (Exception e) {
+            getLogger().warn("ERROR: Error timestamp - {}".format(e.toString()));
+        }
+
+        return formattedTimestamp;
     }
 }

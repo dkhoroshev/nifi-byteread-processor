@@ -28,7 +28,7 @@ public abstract class ByteProcessor extends AbstractProcessor {
             .required(true)
             .addValidator(StandardValidators.INTEGER_VALIDATOR)
             .description("How many Bytes to read to get the length of the message." +
-                    "2B - int16, 4B - int32, 8B - int64")
+                    "2 - int16, 4 - int32, 8 - int64")
             .build();
 
     /*          RELATIONSHIPS           */
