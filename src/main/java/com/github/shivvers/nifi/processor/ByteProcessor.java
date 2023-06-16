@@ -21,6 +21,8 @@ public abstract class ByteProcessor extends AbstractProcessor {
 
     private Integer bytesofsize;
 
+    protected int batchsize;
+
     static final PropertyDescriptor BYTES_TO_READ = new PropertyDescriptor.Builder()
             .name("read.bytes")
             .displayName("Read Bytes")
@@ -29,6 +31,15 @@ public abstract class ByteProcessor extends AbstractProcessor {
             .addValidator(StandardValidators.INTEGER_VALIDATOR)
             .description("How many Bytes to read to get the length of the message." +
                     "2 - int16, 4 - int32, 8 - int64")
+            .build();
+
+    static final PropertyDescriptor BATCH_SIZE = new PropertyDescriptor.Builder()
+            .name("protobuf.batchsize")
+            .displayName("Batch Size")
+            .description("The number of FlowFiles to process in each batch.")
+            .defaultValue("1")
+            .addValidator(StandardValidators.POSITIVE_INTEGER_VALIDATOR)
+            .required(true)
             .build();
 
     /*          RELATIONSHIPS           */
@@ -45,11 +56,20 @@ public abstract class ByteProcessor extends AbstractProcessor {
 
     @Override
     public void init(final ProcessorInitializationContext context){
-        this.properties = List.of(BYTES_TO_READ);
+        List<PropertyDescriptor> properties = new ArrayList<>();
+        properties.add(BYTES_TO_READ);
+        properties.add(BATCH_SIZE);
+        this.properties = Collections.unmodifiableList(properties);
 
-        this.relationships = Set.of(REL_SPLITS, ERROR);
+        Set<Relationship> relationships = new HashSet<>();
+        relationships.add(REL_SPLITS);
+        relationships.add(ERROR);
+        this.relationships = Collections.unmodifiableSet(relationships);
 
         this.bytesofsize = 4;
+
+        this.batchsize = 1;
+
     }
 
     /**
@@ -63,6 +83,8 @@ public abstract class ByteProcessor extends AbstractProcessor {
 
         if (descriptor == BYTES_TO_READ) {
             this.bytesofsize = Integer.parseInt(newValue);
+        } else if (descriptor == BATCH_SIZE) {
+            this.batchsize = Integer.parseInt(newValue);
         }
     }
 
